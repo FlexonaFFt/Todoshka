@@ -32,5 +32,14 @@ buttons_for_registration = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+# Вспомогательная клавиатура для подтверждения данных
+confirm_button = KeyboardButton(text='Подтвердить')
+
+buttons_for_confirmation = ReplyKeyboardMarkup(
+    keyboard=[[confirm_button]],
+    input_field_placeholder='Подтвердите данные',
+    resize_keyboard=True
+)
+
 # Метод для скрытия клавиатуры
 buttons_remove = ReplyKeyboardRemove()

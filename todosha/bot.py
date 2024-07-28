@@ -32,7 +32,7 @@ class TelegramFunctions:
     def __init__(self, dp, bot):
         self.dp = dp
         self.bot = bot
-        self.db = Database('my_database.db')  # Создаем экземпляр базы данных
+        self.db = Database('my_database.db')
 
     def setup_handlers(self):
         @self.dp.message(CommandStart())
@@ -64,34 +64,36 @@ class TelegramFunctions:
         @self.dp.message(self.RegistrationState.phone_number)
         async def process_phone_number(message: types.Message, state: FSMContext):
             try:
-                if message.text.lower() == 'автоматически дать контакт':
-                    await state.update_data(phone_number=message.contact.phone_number)
-                    await state.set_state(self.RegistrationState.firstname)
-                    await message.answer("Пожалуйста, отправьте ваше имя.")
+                if F.text.lower() == 'автоматически дать контакт':
+                    try:
+                        await state.update_data(phone_number=message.contact.phone_number)
+                        await state.set_state(self.RegistrationState.firstname)
+                        await message.answer("Пожалуйста, отправьте ваше имя.")
+                    except:
+                        await message.answer("Это не похоже на ваш номер телефона :( \n Попробуйте ввести его вручную")
+                        await state.set_state(self.RegistrationState.phone_number)
                 else:
-                    await message.answer("Это не похоже на ваш номер телефона :( \n Попробуйте ввести его вручную")
-                    await state.set_state(self.RegistrationState.phone_number)
+                    await state.update_data(phone_number=message.text)
+                    await state.set_state(self.RegistrationState.firstname)
+                    await message.answer("Пожалуйста, отправьте ваше имя")
             except:
-                await state.update_data(phone_number=message.text)
-                await state.set_state(self.RegistrationState.firstname)
-                await message.answer("Пожалуйста, отправьте ваше имя")
+                await message.answer("Что-то пошло не так. Попробуйте ещё раз позже.")
 
         @self.dp.message(self.RegistrationState.firstname)
         async def process_firstname(message: types.Message, state: FSMContext):
             try:
-                await state.update_data(firstname=message.text)
-                await message.answer("Отлично, осталось лишь узнать ваш адрес. \n\nПожалуйста, в точности напишите свой адрес с точностью до улицы.\n\nЕсли ваш адрес 'г. Елабуга, проспект Нефтяников, д. 125'\nТо необходимо написать: Нефтяников 125.", \
-                    reply_markup=kb.buttons_remove)
+                await message.answer("Отлично, осталось лишь подвердить точность этих данных. Вы уверены что правильно указали данные? Если да, нажмите подтвердить. Если хотите изменить введённые данные, перезапустите бота и пройдите процедуру заново.", \
+                    reply_markup=kb.buttons_for_confirmation)
                 await state.set_state(self.RegistrationState.response)
             except:
                 await message.answer("Что-то пошло не так. Попробуйте ещё раз позже.") 
 
         @self.dp.message(self.RegistrationState.response)
         async def process_request(message: types.Message, state: FSMContext):
-            try:
+            #try:
                 data = await state.get_data()
-                phone_number = data['phone_number']
-                firstname = data['firstname']
+                phone_number = data.get('phone_number')
+                firstname = data.get('firstname')
                 username = message.from_user.username
 
                 if message.text.lower() == 'подтвердить':
@@ -100,9 +102,9 @@ class TelegramFunctions:
                     print("Регистрация пользователя прошла успешно!")
                     await state.clear()
                 else:
-                    await message.answer('Пожалуйста, подтвердите адрес')
-            except:
-                await message.answer("Что-то пошло не так. Попробуйте ещё раз позже.")
+                    await message.answer('Пожалуйста, подтвердите данные')
+            #except:
+                #await message.answer("Что-то пошло не так. Попробуйте ещё раз позже.")
 
         @self.dp.message(F.text.lower() == 'статус')
         async def status_command(message: types.Message):

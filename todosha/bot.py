@@ -82,6 +82,7 @@ class TelegramFunctions:
         @self.dp.message(self.RegistrationState.firstname)
         async def process_firstname(message: types.Message, state: FSMContext):
             try:
+                await state.update_data(firstname=message.text)
                 await message.answer("Отлично, осталось лишь подвердить точность этих данных. Вы уверены что правильно указали данные? Если да, нажмите подтвердить. Если хотите изменить введённые данные, перезапустите бота и пройдите процедуру заново.", \
                     reply_markup=kb.buttons_for_confirmation)
                 await state.set_state(self.RegistrationState.response)

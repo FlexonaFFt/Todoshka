@@ -12,8 +12,7 @@ class Database:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             phone_number TEXT NOT NULL,
             username TEXT NOT NULL,
-            firstname TEXT NOT NULL,
-            adress TEXT NOT NULL
+            firstname TEXT NOT NULL
         )
         ''')
         self.connection.commit()

@@ -18,10 +18,10 @@ class Database:
         ''')
         self.connection.commit()
 
-    def add_user(self, phone_number, username, firstname, adress):
+    def add_user(self, phone_number, username, firstname):
         self.cursor.execute('''
-        INSERT INTO users (phone_number, username, firstname, adress) VALUES (?, ?, ?, ?)
-        ''', (phone_number, username, firstname, adress))
+        INSERT INTO users (phone_number, username, firstname) VALUES (?, ?, ?)
+        ''', (phone_number, username, firstname))
         self.connection.commit()
 
     def get_user_by_username(self, username):

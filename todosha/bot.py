@@ -82,7 +82,7 @@ class TelegramFunctions:
                 await state.update_data(firstname=message.text)
                 await message.answer("Отлично, осталось лишь узнать ваш адрес. \n\nПожалуйста, в точности напишите свой адрес с точностью до улицы.\n\nЕсли ваш адрес 'г. Елабуга, проспект Нефтяников, д. 125'\nТо необходимо написать: Нефтяников 125.", \
                     reply_markup=kb.buttons_remove)
-                await state.set_state(self.RegistrationState.adress)
+                await state.set_state(self.RegistrationState.response)
             except:
                 await message.answer("Что-то пошло не так. Попробуйте ещё раз позже.") 
 
@@ -90,13 +90,12 @@ class TelegramFunctions:
         async def process_request(message: types.Message, state: FSMContext):
             try:
                 data = await state.get_data()
-                adress = data['adress']
                 phone_number = data['phone_number']
                 firstname = data['firstname']
                 username = message.from_user.username
 
                 if message.text.lower() == 'подтвердить':
-                    self.db.add_user(phone_number, username, firstname, adress)
+                    self.db.add_user(phone_number, username, firstname)
                     await message.answer("Вы успешно зарегистрированы!", reply_markup=kb.invite_button_grid_for_registrated)
                     print("Регистрация пользователя прошла успешно!")
                     await state.clear()
